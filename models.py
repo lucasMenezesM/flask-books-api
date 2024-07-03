@@ -8,7 +8,6 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
-# todo CREATE MODELS USER, BOOK AND GENRE
 
 class User(db.Model):
     __tablename__ = "users"
@@ -32,6 +31,15 @@ class Book(db.Model):
 
     user = relationship("User", back_populates="books")
     genre = relationship("Genre", back_populates="books")
+
+    def columns_to_dict(self):
+        dict_ = {}
+        for key in self.__mapper__.c.keys():
+            dict_[key] = getattr(self, key)
+        return dict_
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Genre(db.Model):
