@@ -6,3 +6,8 @@ def user_to_dict(user):
     books = [book_to_dict(book) for book in user.books]
     row = {"id": user.id, "name": user.name, "books": books, "email": user.email}
     return row
+
+def genre_to_dic(genre):
+    books = [book_to_dict(book) for book in genre.books]
+    row = {"id": genre.id, "name": genre.name, "books": books}
+    return row

@@ -1,7 +1,7 @@
 from main import app
 from flask import jsonify, request, Blueprint
 from models import User, Book, Genre, db
-from utilites import book_to_dict
+from utilities import book_to_dict
 
 books_bp = Blueprint('books_bp', __name__)
 

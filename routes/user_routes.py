@@ -1,7 +1,7 @@
 from main import app
 from flask import jsonify, request, Blueprint
 from models import User, db
-from utilites import user_to_dict
+from utilities import user_to_dict
 from werkzeug.security import generate_password_hash, check_password_hash
 
 users_bp = Blueprint('users_bp', __name__)
