@@ -69,7 +69,7 @@ def create_book(book_id):
         return jsonify(error=e), 500
     
 
-# GET A BOOK BY USER ID
+# GET ALL BOOKS BY USER ID
 @books_bp.route("/user/<int:user_id>")
 def get_book_from_user(user_id):
     try:
