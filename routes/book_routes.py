@@ -1,10 +1,12 @@
 from main import app
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 from models import User, Book, Genre, db
 from utilites import book_to_dict
 
+books_bp = Blueprint('books_bp', __name__)
+
 # ADD AND GET ALL BOOKS
-@app.route("/api/book", methods=["POST", "GET"])
+@books_bp.route("/", methods=["POST", "GET"])
 def get_all_books():
 
     # ADD A NEW BOOK
@@ -33,7 +35,7 @@ def get_all_books():
 
 
 # GET A BOOK BY ID
-@app.route("/api/book/<int:book_id>")
+@books_bp.route("/<int:book_id>")
 def get_book_by_id(book_id):
     try:
         book = db.session.execute(db.select(Book).filter_by(id=book_id)).scalar()
@@ -47,7 +49,7 @@ def get_book_by_id(book_id):
 
 
 # EDIT BOOK
-@app.route("/api/book/edit/<int:book_id>", methods=["POST"])
+@books_bp.route("/edit/<int:book_id>", methods=["POST"])
 def create_book(book_id):
 
     try:
@@ -68,7 +70,7 @@ def create_book(book_id):
     
 
 # GET A BOOK BY USER ID
-@app.route("/api/book/user/<int:user_id>")
+@books_bp.route("/user/<int:user_id>")
 def get_book_from_user(user_id):
     try:
         books = db.session.execute(db.select(Book).filter_by(user_id=user_id)).scalars().all()
@@ -83,7 +85,7 @@ def get_book_from_user(user_id):
 
 
 # DELETE A BOOK BY ID
-@app.route("/api/book/delete/<int:book_id>", methods=["DELETE"])
+@books_bp.route("/delete/<int:book_id>", methods=["DELETE"])
 def delete_book(book_id):
     try:
         book = db.session.execute(db.select(Book).filter_by(id=book_id)).scalar()
@@ -100,7 +102,7 @@ def delete_book(book_id):
 
 
 # QUERY A BOOK USING PARAMS
-@app.route("/api/book/query")
+@books_bp.route("/query")
 def query_books():
     title = request.args.get("title")
     genre = request.args.get("genre")
@@ -132,4 +134,3 @@ def query_books():
     returned_books = [book_to_dict(book) for book in selected_books]
     
     return jsonify(books=returned_books)
-
