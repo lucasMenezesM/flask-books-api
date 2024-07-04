@@ -3,35 +3,14 @@ from flask import jsonify, request, Blueprint
 from models import User, Book, Genre, db
 from utilities import book_to_dict
 from datetime import datetime
+from flask_login import login_required
 
 books_bp = Blueprint('books_bp', __name__)
 
-# ADD AND GET ALL BOOKS
-@books_bp.route("/", methods=["POST", "GET"])
+# GET ALL BOOKS
+@books_bp.route("/", methods=["GET"])
 def get_all_books():
 
-    # ADD A NEW BOOK
-    if request.method == "POST":
-        try:
-            title = request.form["title"]
-            author = request.form["author"]
-            genre_id = request.form["genre_id"]
-            user_id = request.form["user_id"]
-            description = request.form["description"]
-
-            if title and author:
-                new_book = Book(title=title, author=author, genre_id= genre_id, user_id=user_id, description=description)
-                db.session.add(new_book)
-                db.session.commit()
-            else:
-                jsonify(error="author and title fields should not be empty."), 400
-
-            return jsonify(message="Book created.")
-    
-        except Exception as e:
-            return jsonify(error=str(e)), 500
-        
-    # GET ALL BOOKS
     try:
         books = db.session.execute(db.select(Book)).scalars().all()
         books_list = [book_to_dict(book) for book in books]
@@ -40,6 +19,29 @@ def get_all_books():
 
     return jsonify(books=books_list)
 
+
+@books_bp.route("/", methods=["POST"])
+@login_required
+def add_new_book():
+    try:
+        title = request.form["title"]
+        author = request.form["author"]
+        genre_id = request.form["genre_id"]
+        user_id = request.form["user_id"]
+        description = request.form["description"]
+
+        if title and author:
+            new_book = Book(title=title, author=author, genre_id= genre_id, user_id=user_id, description=description)
+            db.session.add(new_book)
+            db.session.commit()
+        else:
+            jsonify(error="author and title fields should not be empty."), 400
+
+        return jsonify(message="Book created.")
+
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+    
 
 # GET A BOOK BY ID
 @books_bp.route("/<int:book_id>")
@@ -57,8 +59,8 @@ def get_book_by_id(book_id):
 
 # EDIT BOOK
 @books_bp.route("/edit/<int:book_id>", methods=["POST"])
+@login_required
 def edit_book(book_id):
-
     try:
         book = db.session.execute(db.select(Book).filter_by(id=book_id)).scalar()
         if not book:
@@ -100,6 +102,7 @@ def get_book_from_user(user_id):
 
 # DELETE A BOOK BY ID
 @books_bp.route("/delete/<int:book_id>", methods=["DELETE"])
+@login_required
 def delete_book(book_id):
     try:
         book = db.session.execute(db.select(Book).filter_by(id=book_id)).scalar()
