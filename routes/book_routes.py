@@ -25,11 +25,14 @@ def get_all_books():
             return jsonify(message="Book created.")
     
         except Exception as e:
-            return jsonify(error=e), 500
+            return jsonify(error=str(e)), 500
         
     # GET ALL BOOKS
-    books = db.session.execute(db.select(Book)).scalars().all()
-    books_list = [book_to_dict(book) for book in books]
+    try:
+        books = db.session.execute(db.select(Book)).scalars().all()
+        books_list = [book_to_dict(book) for book in books]
+    except Exception as e:
+            return jsonify(error=str(e)), 500
 
     return jsonify(books=books_list)
 
@@ -45,7 +48,7 @@ def get_book_by_id(book_id):
             return jsonify(book=book_to_dict(book))
 
     except Exception as e:
-        return jsonify(error=e), 500
+        return jsonify(error=str(e)), 500
 
 
 # EDIT BOOK
@@ -66,7 +69,7 @@ def create_book(book_id):
         return jsonify(message="Book Edited.")
     
     except Exception as e:
-        return jsonify(error=e), 500
+        return jsonify(error=str(e)), 500
     
 
 # GET ALL BOOKS BY USER ID
@@ -81,7 +84,7 @@ def get_book_from_user(user_id):
 
         return jsonify(books=returned_books)
     except Exception as e:
-        return jsonify(error=e), 500
+        return jsonify(error=str(e)), 500
 
 
 # DELETE A BOOK BY ID
@@ -98,7 +101,7 @@ def delete_book(book_id):
         return jsonify(message="Book deleted"), 202
     
     except Exception as e:
-        return jsonify(error=e), 500
+        return jsonify(error=str(e)), 500
 
 
 # QUERY A BOOK USING PARAMS
@@ -108,29 +111,33 @@ def query_books():
     genre = request.args.get("genre")
     author = request.args.get("author")
 
-    books = db.session.execute(db.select(Book)).scalars().all()
-    selected_books = []
+    try:
+        books = db.session.execute(db.select(Book)).scalars().all()
+        selected_books = []
 
-    if title or genre or author:
-        for book in books:
-            if title:
-                if title.lower() in book.title.lower():
-                    selected_books.append(book)
-                    continue
+        if title or genre or author:
+            for book in books:
+                if title:
+                    if title.lower() in book.title.lower():
+                        selected_books.append(book)
+                        continue
 
-            if genre:
-                if genre.lower() in book.genre.name.lower():
-                    selected_books.append(book)
-                    continue
-            
-            if author:
-                if author.lower() in book.author.lower():
-                    selected_books.append(book)
-                    continue
-    else:
-        selected_books = books
+                if genre:
+                    if genre.lower() in book.genre.name.lower():
+                        selected_books.append(book)
+                        continue
+                
+                if author:
+                    if author.lower() in book.author.lower():
+                        selected_books.append(book)
+                        continue
+        else:
+            selected_books = books
 
 
-    returned_books = [book_to_dict(book) for book in selected_books]
+        returned_books = [book_to_dict(book) for book in selected_books]
+        
+        return jsonify(books=returned_books)
     
-    return jsonify(books=returned_books)
+    except Exception as e:
+        return jsonify(error=str(e)), 500
