@@ -19,10 +19,12 @@ def get_all_books():
             user_id = request.form["user_id"]
             description = request.form["description"]
 
-            new_book = Book(title=title, author=author, genre_id= genre_id, user_id=user_id, description=description)
-
-            db.session.add(new_book)
-            db.session.commit()
+            if title and author:
+                new_book = Book(title=title, author=author, genre_id= genre_id, user_id=user_id, description=description)
+                db.session.add(new_book)
+                db.session.commit()
+            else:
+                jsonify(error="author and title fields should not be empty."), 400
 
             return jsonify(message="Book created.")
     
@@ -55,15 +57,22 @@ def get_book_by_id(book_id):
 
 # EDIT BOOK
 @books_bp.route("/edit/<int:book_id>", methods=["POST"])
-def create_book(book_id):
+def edit_book(book_id):
 
     try:
         book = db.session.execute(db.select(Book).filter_by(id=book_id)).scalar()
         if not book:
             return jsonify(message="Book not found"), 404
         
-        book.title = request.form["title"]
-        book.author = request.form["author"]
+        title = request.form["title"]
+        author = request.form["author"]
+        
+        if not title or not author:
+            return jsonify(error="author and title fields should not be empty."), 400
+        
+        book.title = title
+        book.author = author
+        book.description = request.form["description"]
         book.genre_id = request.form["genre_id"]
 
         db.session.commit()
