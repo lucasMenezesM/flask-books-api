@@ -2,6 +2,7 @@ from main import app
 from flask import jsonify, request, Blueprint
 from models import User, Book, Genre, db
 from utilities import book_to_dict
+from datetime import datetime
 
 books_bp = Blueprint('books_bp', __name__)
 
@@ -16,8 +17,9 @@ def get_all_books():
             author = request.form["author"]
             genre_id = request.form["genre_id"]
             user_id = request.form["user_id"]
+            description = request.form["description"]
 
-            new_book = Book(title=title, author=author, genre_id= genre_id, user_id=user_id)
+            new_book = Book(title=title, author=author, genre_id= genre_id, user_id=user_id, description=description)
 
             db.session.add(new_book)
             db.session.commit()

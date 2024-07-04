@@ -1,7 +1,8 @@
 from sqlalchemy import Integer, String, Text
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text
+from sqlalchemy import Integer, String, Text, DateTime
+from datetime import datetime, UTC
 
 class Base(DeclarativeBase):
   pass
@@ -15,6 +16,7 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(String(250), nullable=False)
     email: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
+    register_date: Mapped[str] = mapped_column(DateTime, default=datetime.now(UTC))
 
     books = db.relationship("Book", back_populates="user")
     
@@ -25,6 +27,8 @@ class Book(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(250), nullable=False)
     author: Mapped[str] = mapped_column(String(250), nullable=False)
+    added_date: Mapped[str] = mapped_column(DateTime, default=datetime.now(UTC))
+    description: Mapped[str] = mapped_column(Text)
 
     genre_id: Mapped[int] = mapped_column(Integer, db.ForeignKey('genres.id'), nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, db.ForeignKey('users.id'), nullable=False)
